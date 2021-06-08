@@ -1,7 +1,8 @@
-from telethon import TelegramClient, events, Button
+from telethon import TelegramClient, events, Button, types
 from decouple import config
 from ProfanityDetector import detector
 import logging
+from telethon.tl.functions.channels import GetParticipantRequest
 
 logging.basicConfig(
     format="[%(levelname) 5s/%(asctime)s] %(name)s: %(message)s", level=logging.INFO
@@ -18,6 +19,19 @@ log.info("Starting Bot...")
 
 bot = TelegramClient("bot", apiid, apihash).start(bot_token=BOT_TOKEN)
 
+# check admins
+async def check_if_admin(message):
+    result = await bot(
+        GetParticipantRequest(
+            channel=message.chat_id,
+            user_id=message.sender_id,
+        )
+    )
+    p = result.participant
+    return isinstance(
+        p, (types.ChannelParticipantCreator, types.ChannelParticipantAdmin)
+    )
+
 
 @bot.on(
     events.NewMessage(incoming=True, pattern="^/start$", func=lambda e: e.is_private)
@@ -26,9 +40,14 @@ async def start_msg(event):
     sender = await bot.get_entity(event.sender_id)
     await event.reply(
         f"Hi {sender.first_name}!\nI am a profanity detector bot.\n\nMake me admin in your group with `delete messages` permission and I'll delete messsages containing abuses!",
-       buttons=[
+        buttons=[
             [Button.inline("Help 🆘", data="helpme")],
-            [Button.url("Add me to a group ➕", url=f"http://t.me/{(await bot.get_me()).username}?startgroup=botstart")],
+            [
+                Button.url(
+                    "Add me to a group ➕",
+                    url=f"http://t.me/{(await bot.get_me()).username}?startgroup=botstart",
+                )
+            ],
             [
                 Button.url("📥 Channel", url="https://t.me/BotzHub"),
                 Button.url(
@@ -69,7 +88,12 @@ async def start_msg(event):
         f"Hi {sender.first_name}!\nI am a profanity detector bot.\n\nMake me admin in your group with `delete messages` permission and I'll delete messsages containing abuses!",
         buttons=[
             [Button.inline("Help 🆘", data="helpme")],
-            [Button.url("Add me to a group ➕", url=f"http://t.me/{(await bot.get_me()).username}?startgroup=botstart")],
+            [
+                Button.url(
+                    "Add me to a group ➕",
+                    url=f"http://t.me/{(await bot.get_me()).username}?startgroup=botstart",
+                )
+            ],
             [
                 Button.url("📥 Channel", url="https://t.me/BotzHub"),
                 Button.url(
@@ -82,6 +106,8 @@ async def start_msg(event):
 
 @bot.on(events.NewMessage(incoming=True, func=lambda e: e.is_group))
 async def deleter_(event):
+    if await check_if_admin(event):
+        return
     sentence = event.raw_text
     sender = await bot.get_entity(event.sender_id)
     word, detected = detector(sentence)
