@@ -1,0 +1,4 @@
+telethon
+ProfanityDetector
+python-decouple
+requests
