@@ -114,7 +114,7 @@ async def deleter_(event):
     if detected:
         try:
             await event.reply(
-                f"Hey {sender.first_name}, you used a blacklisted word (`{word}`) and so your message has been deleted!"
+                f"Hey {sender.first_name}, you used a blacklisted word and so your message has been deleted!"
             )
             await event.delete()
         except:
