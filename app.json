@@ -1,0 +1,25 @@
+{
+    "name": "Profanity Detector",
+    "description": "Profanity Detector Bot.",
+    "logo": "",
+    "keywords": [
+        "telegram",
+        "telethon",
+        "telegram-bot",
+        "profanity-detector"
+    ],
+    "repository": "https://github.com/xditya/ProfanityDetectorBot",
+    "website": "xditya.me",
+    "success_url": "https://t.me/BotzHub",
+    "env": {
+        "BOT_TOKEN": {
+            "description": "Bot token, get it from @BotFather.",
+            "value": ""
+        }
+    },
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ]
+}
