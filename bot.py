@@ -106,7 +106,10 @@ async def start_msg(event):
 
 @bot.on(events.NewMessage(incoming=True, func=lambda e: e.is_group))
 async def deleter_(event):
-    if await check_if_admin(event):
+    try:
+        if await check_if_admin(event):
+            return
+    except:
         return
     sentence = event.raw_text
     sender = await bot.get_entity(event.sender_id)
